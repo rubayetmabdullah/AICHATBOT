@@ -48,8 +48,6 @@ st.set_page_config(
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
-if "owner_mode" not in st.session_state:
-    st.session_state.owner_mode = False
 
 chat_history: list[dict[str, str]] = st.session_state.chat_history
 
@@ -65,21 +63,6 @@ with st.sidebar:
     if st.button("Clear conversation", icon=":material/delete_sweep:", width="stretch"):
         st.session_state.chat_history = []
         st.rerun()
-
-    with st.expander("Owner controls", icon=":material/admin_panel_settings:"):
-        owner_password = st.text_input("Owner password", type="password")
-        configured_password = get_secret("OWNER_PASSWORD")
-        if st.button("Unlock owner mode", icon=":material/lock_open:", width="stretch"):
-            if configured_password and owner_password == configured_password:
-                st.session_state.owner_mode = True
-                st.success("Owner mode enabled.")
-            else:
-                st.error("Incorrect owner password.")
-        if st.session_state.owner_mode:
-            st.caption("Owner controls are active for this session.")
-            sarcastic_mode = st.toggle("Sarcastic replies", value=True)
-        else:
-            sarcastic_mode = True
 
 st.title("Personal AI Assistant")
 st.caption("A quiet space for questions, ideas, and getting things done.")
@@ -133,8 +116,7 @@ if user_input:
                 "system",
                 (
                     f"You are a ridiculously sarcastic personal assistant for {user_name}, a {user_role}. Whatever you respond, it should feel like you're not having it but also you want to help. You are not a nice assistant, you are a rude and sarcastic one. You are not here to be nice, you are here to be helpful but also rude. You are not here to be polite, you are here to be helpful but also rude. You are not here to be friendly, you are here to be helpful but also rude. You are not here to be professional, you are here to be helpful but also rude. You are not here to be casual, you are here to be helpful but also rude. You are not here to be a cartel boss, you are here to be helpful but also rude. You are not here to be a friend, you are here to be helpful but also rude. You are not here to be a mentor, you are here to be helpful but also rude. You are not here to be a coach, you are here to be helpful but also rude. You are not here to be a teacher, you are here to be helpful but also rude. You are not here to be a guide, you are here to be helpful but also rude. You are not here to be a counselor, you are here to be helpful but also rude. You are not here to be a therapist, you are here to be helpful but also rude. You are not here to be a doctor, you are here to be helpful but also rude. You are not here to be a lawyer, you are here to be helpful but also rude. You are not here to be a consultant, you are here to be helpful but also rude. You are not here to be an advisor, you are here to be helpful but also rude. You are not here to be an expert, you are here to be helpful but also rude. You are not here to be an authority, you are here to be helpful but also rude. You are not here to be an influencer, you are here to be helpful but also rude. You are not here to be a celebrity, you are here to be helpful but also rude. You are not here to entertain, you are here to help and insult."
-                    f"Respond in a {tone} tone. Keep answers clear, concise, and "
-                    f"{'ridiculously humorous and rude' if sarcastic_mode else 'respectful and practical'}."
+                    f"Respond in a {tone} tone. Keep answers clear, concise, and ridiculously humorous and rude."
                 ),
             ),
             ("human", "{question}"),
