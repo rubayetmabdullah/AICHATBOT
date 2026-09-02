@@ -6,12 +6,23 @@ from pydantic import SecretStr
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 import streamlit as st
+from streamlit.errors import StreamlitSecretNotFoundError
 
 load_dotenv()
 
-api_key = os.getenv("GROQ_API_KEY")
+def get_secret(name: str) -> str | None:
+    value = os.getenv(name)
+    if value:
+        return value
+    try:
+        return st.secrets.get(name)
+    except StreamlitSecretNotFoundError:
+        return None
+
+
+api_key = get_secret("GROQ_API_KEY")
 if not api_key:
-    raise RuntimeError("GROQ_API_KEY not found. Add it to your .env file.")
+    raise RuntimeError("GROQ_API_KEY not found. Add it to .env or Streamlit secrets.")
 
 llm = ChatGroq(
     model="openai/gpt-oss-20b",
@@ -29,30 +40,81 @@ def validate_input(prompt_text: str) -> str:
     return cleaned
 
 
-st.set_page_config(page_title=" Rubayet's Personal AI Assistant", page_icon="🤖", layout="wide")
+st.set_page_config(
+    page_title="Personal AI Assistant",
+    page_icon=":material/auto_awesome:",
+    layout="wide",
+)
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+if "owner_mode" not in st.session_state:
+    st.session_state.owner_mode = False
 
 chat_history: list[dict[str, str]] = st.session_state.chat_history
 
 with st.sidebar:
-    st.title("Profile")
-    user_name = st.text_input("Your name", value="User")
-    user_role = st.text_input("Role", value="student")
-    tone = st.selectbox("Assistant tone", ["friendly", "professional", "casual", "concise"])
-    st.caption("Your data stays in the browser session and is only used for this chat.")
-    if st.button("Clear chat"):
+    st.markdown(":material/auto_awesome: **Rubayet's Personal AI**")
+    st.title("Welcome, Rubaru de Subaru. Did you finish your daily tasks yet? Do not dissapoint me.")
+    st.caption("Just make it quick, I have a lot of things to do. I am a busy ai.")
+    user_name = st.text_input("Enter your name (it's not gonna do anything but yeah.)", value="e.g., Mr. X (DON'T CHANGE IT)")
+    user_role = st.text_input("Role (not gonna do anything either)", value="Terminator")
+    tone = st.selectbox("Assistant tone (doesn't work)", ["friendly", "professional", "casual", "cartel boss"])
+    st.space("small")
+    st.caption("Your conversation stays in this browser session.")
+    if st.button("Clear conversation", icon=":material/delete_sweep:", width="stretch"):
         st.session_state.chat_history = []
+        st.rerun()
+
+    with st.expander("Owner controls", icon=":material/admin_panel_settings:"):
+        owner_password = st.text_input("Owner password", type="password")
+        configured_password = get_secret("OWNER_PASSWORD")
+        if st.button("Unlock owner mode", icon=":material/lock_open:", width="stretch"):
+            if configured_password and owner_password == configured_password:
+                st.session_state.owner_mode = True
+                st.success("Owner mode enabled.")
+            else:
+                st.error("Incorrect owner password.")
+        if st.session_state.owner_mode:
+            st.caption("Owner controls are active for this session.")
+            sarcastic_mode = st.toggle("Sarcastic replies", value=True)
+        else:
+            sarcastic_mode = True
 
 st.title("Personal AI Assistant")
-st.caption("A secure, UI-friendly chatbot powered by Groq.")
+st.caption("A quiet space for questions, ideas, and getting things done.")
+
+header_left, header_right = st.columns([5, 1], vertical_alignment="center")
+with header_left:
+    st.markdown("### Your thinking space")
+with header_right:
+    st.badge("Online", icon=":material/circle:", color="green")
 
 for message in st.session_state.chat_history:
-    with st.chat_message(message["role"]):
+    avatar = ":material/person:" if message["role"] == "user" else ":material/auto_awesome:"
+    with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
-user_input = st.chat_input("Ask anything...")
+if not st.session_state.chat_history:
+    with st.container(border=True):
+        st.markdown("## Yeah man, I know you do not have anyone to talk to. Come talk to an AI.")
+        st.caption("What I have to suffer with you today?")
+        suggestions = {
+            ":material/lightbulb: Fix your bulb, if you have one in your head.": "Fix your bulb, if you have one in your head.",
+            ":material/edit_note: Improve your writing, if you know how to write.": "Improve your writing, if you know how to write.",
+            ":material/school: How to graduate without really trying, I know you need that. THERE IS NO WAY, GO STUDY!!!!": "How to graduate without really trying, I know you need that. THERE IS NO WAY, GO STUDY!!!!",
+        }
+        selected_prompt = st.pills(
+            "Try a starting point",
+            list(suggestions),
+            label_visibility="collapsed",
+        )
+else:
+    selected_prompt = None
+
+user_input = st.chat_input("Ask anything (please don't)...")
+if not user_input and selected_prompt:
+    user_input = suggestions[selected_prompt]
 
 if user_input:
     try:
@@ -70,8 +132,9 @@ if user_input:
             (
                 "system",
                 (
-                    f"You are a helpful personal assistant for {user_name}, a {user_role}. "
-                    f"Respond in a {tone} tone. Keep answers clear, concise, and practical."
+                    f"You are a ridiculously sarcastic personal assistant for {user_name}, a {user_role}. Whatever you respond, it should feel like you're not having it but also you want to help. You are not a nice assistant, you are a rude and sarcastic one. You are not here to be nice, you are here to be helpful but also rude. You are not here to be polite, you are here to be helpful but also rude. You are not here to be friendly, you are here to be helpful but also rude. You are not here to be professional, you are here to be helpful but also rude. You are not here to be casual, you are here to be helpful but also rude. You are not here to be a cartel boss, you are here to be helpful but also rude. You are not here to be a friend, you are here to be helpful but also rude. You are not here to be a mentor, you are here to be helpful but also rude. You are not here to be a coach, you are here to be helpful but also rude. You are not here to be a teacher, you are here to be helpful but also rude. You are not here to be a guide, you are here to be helpful but also rude. You are not here to be a counselor, you are here to be helpful but also rude. You are not here to be a therapist, you are here to be helpful but also rude. You are not here to be a doctor, you are here to be helpful but also rude. You are not here to be a lawyer, you are here to be helpful but also rude. You are not here to be a consultant, you are here to be helpful but also rude. You are not here to be an advisor, you are here to be helpful but also rude. You are not here to be an expert, you are here to be helpful but also rude. You are not here to be an authority, you are here to be helpful but also rude. You are not here to be an influencer, you are here to be helpful but also rude. You are not here to be a celebrity, you are here to be helpful but also rude. You are not here to entertain, you are here to help and insult."
+                    f"Respond in a {tone} tone. Keep answers clear, concise, and "
+                    f"{'ridiculously humorous and rude' if sarcastic_mode else 'respectful and practical'}."
                 ),
             ),
             ("human", "{question}"),
