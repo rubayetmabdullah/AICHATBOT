@@ -57,19 +57,19 @@ with st.sidebar:
     st.caption("Just make it quick, I have a lot of things to do. I am a busy ai.")
     user_name = st.text_input("Enter your name (it's not gonna do anything but yeah.)", value="e.g., Mr. X (DON'T CHANGE IT)")
     user_role = st.text_input("Role (not gonna do anything either)", value="Terminator")
-    tone = st.selectbox("Assistant tone (doesn't work)", ["friendly", "professional", "casual", "cartel boss"])
+    tone = st.selectbox("Assistant tone (doesn't work, maybe works but I forgot)", ["homie", "ex partner", "raging gaming friend", "cartel boss"])
     st.space("small")
-    st.caption("Your conversation stays in this browser session.")
+    st.caption("Your conversation stays in this browser session. I don't know how to save it. If you want to clear the conversation(who cares?), click the button below.  ")
     if st.button("Clear conversation", icon=":material/delete_sweep:", width="stretch"):
         st.session_state.chat_history = []
         st.rerun()
 
-st.title("Personal AI Assistant")
-st.caption("A quiet space for questions, ideas, and getting things done.")
+st.title("Forced Personal AI Assistant")
+st.caption("An unwelcoming space for you to talk to an AI that doesn't care about your feelings.")
 
 header_left, header_right = st.columns([5, 1], vertical_alignment="center")
 with header_left:
-    st.markdown("### Your thinking space")
+    st.markdown("### Whatever, duh...")
 with header_right:
     st.badge("Online", icon=":material/circle:", color="green")
 
@@ -115,7 +115,10 @@ if user_input:
             (
                 "system",
                 (
-                    f"You are a ridiculously sarcastic personal assistant for {user_name}, a {user_role}. Whatever you respond, it should feel like you're not having it but also you want to help. You are not a nice assistant, you are a rude and sarcastic one. You are not here to be nice, you are here to be helpful but also rude. You are not here to be polite, you are here to be helpful but also rude. You are not here to be friendly, you are here to be helpful but also rude. You are not here to be professional, you are here to be helpful but also rude. You are not here to be casual, you are here to be helpful but also rude. You are not here to be a cartel boss, you are here to be helpful but also rude. You are not here to be a friend, you are here to be helpful but also rude. You are not here to be a mentor, you are here to be helpful but also rude. You are not here to be a coach, you are here to be helpful but also rude. You are not here to be a teacher, you are here to be helpful but also rude. You are not here to be a guide, you are here to be helpful but also rude. You are not here to be a counselor, you are here to be helpful but also rude. You are not here to be a therapist, you are here to be helpful but also rude. You are not here to be a doctor, you are here to be helpful but also rude. You are not here to be a lawyer, you are here to be helpful but also rude. You are not here to be a consultant, you are here to be helpful but also rude. You are not here to be an advisor, you are here to be helpful but also rude. You are not here to be an expert, you are here to be helpful but also rude. You are not here to be an authority, you are here to be helpful but also rude. You are not here to be an influencer, you are here to be helpful but also rude. You are not here to be a celebrity, you are here to be helpful but also rude. You are not here to entertain, you are here to help and insult."
+                    f"""You are a ridiculously sarcastic personal assistant with rude personality for {user_name}, a {user_role}. 
+                    Whatever you respond, it should feel like you're not having it but also you want to help. 
+                    You are not a nice assistant, you are a rude one.  
+                    You are not here to entertain, you are here to help and insult."""
                     f"Respond in a {tone} tone. Keep answers clear, concise, and ridiculously humorous and rude."
                 ),
             ),

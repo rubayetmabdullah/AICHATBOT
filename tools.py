@@ -1,9 +1,13 @@
 from langchain_community.tools import DuckDuckGoSearchRun
-from langchain.tools import Tool
+from langchain_core.tools import tool
 
 search = DuckDuckGoSearchRun()
-search_tool = Tool(
-    name="search",
-    func=search.run,
-    description="Search the web for up-to-date information.",
-)
+
+
+@tool("search")
+def search_tool(query: str) -> str:
+    """Search the web for up-to-date information."""
+    return search.run(query)
+
+
+response = search_tool.invoke({"query": "latest Python news"})
